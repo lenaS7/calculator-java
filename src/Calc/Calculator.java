@@ -4,15 +4,9 @@ import java.awt.Color;
 import java.awt.event.*;
 import javax.swing.JButton;
 
-/**
- *
- * @author youcefhmd
- */
-public final class Calculator extends javax.swing.JFrame {
 
-    private String currentOperand;
-    private String previousOperand;
-    private String operation;
+public final class Calculator extends javax.swing.JFrame {
+    private final Calc.core.CalculatorContext ctx = Calc.core.CalculatorContext.getInstance();
 
     private int x, y;
 
@@ -64,94 +58,87 @@ public final class Calculator extends javax.swing.JFrame {
     }
 
     public void clear() {
-        this.currentOperand = "";
-        this.previousOperand = "";
-        this.operation = "";
+        ctx.clear();
         this.updateDisplay();
     }
 
     public void appendNumber(String number) {
-        if (this.currentOperand.equals("0") && number.equals("0")) {
+        ctx.clearError();
+
+        if (ctx.getCurrentOperand().equals("0") && number.equals("0")) {
             return;
         }
 
-        if (number.equals(".") && this.currentOperand.contains(".")) {
+        if (number.equals(".") && ctx.getCurrentOperand().contains(".")) {
             return;
         }
 
-        if (this.currentOperand.equals("0")
+        if (ctx.getCurrentOperand().equals("0")
                 && !number.equals("0")
                 && !number.equals(".")) {
-            this.currentOperand = "";
+            ctx.setCurrentOperand("");
         }
 
-        this.currentOperand += number;
+        ctx.setCurrentOperand(ctx.getCurrentOperand() + number);
         this.updateDisplay();
     }
 
     public void chooseOperation(String operation) {
-        if (this.currentOperand.equals("") && !this.previousOperand.equals("")) {
-            this.operation = operation;
+        if (ctx.getCurrentOperand().equals("") && !ctx.getPreviousOperand().equals("")) {
+            ctx.setOperation(operation);
             this.updateDisplay();
         }
-        if (this.currentOperand.equals("")) {
+        if (ctx.getCurrentOperand().equals("")) {
             return;
         }
 
-        if (!this.previousOperand.equals("")) {
+        if (!ctx.getPreviousOperand().equals("")) {
             this.compute();
         }
 
-        this.operation = operation;
-        this.previousOperand = this.currentOperand;
-        this.currentOperand = "";
+        ctx.setOperation(operation);
+        ctx.setPreviousOperand(ctx.getCurrentOperand());
+        ctx.setCurrentOperand("");
         this.updateDisplay();
     }
 
     public void compute() {
+        if (ctx.getCurrentOperand().equals("") || ctx.getPreviousOperand().equals("")) {
+            return;
+        }
+
+        float curr = Float.parseFloat(ctx.getCurrentOperand());
+        float prev = Float.parseFloat(ctx.getPreviousOperand());
+
         float computation;
-        if (this.currentOperand.equals("") || this.previousOperand.equals("")) {
+        try {
+            Calc.operations.Operation op = Calc.operations.OperationFactory.create(ctx.getOperation());
+            computation = op.apply(prev, curr);
+        } catch (ArithmeticException ex) {
+            this.clear();
+            ctx.setCurrentOperand("Error");
+            this.updateDisplay();
             return;
         }
 
-        float curr = Float.parseFloat(this.currentOperand);
-        float prev = Float.parseFloat(this.previousOperand);
-        if (Float.isNaN(curr) || Float.isNaN(prev)) {
-            return;
+        if ((computation - (int) computation) != 0) {
+            ctx.setCurrentOperand(Float.toString(computation));
+        } else {
+            ctx.setCurrentOperand(Integer.toString((int) computation));
         }
 
-        switch (this.operation) {
-            case "+" ->
-                computation = prev + curr;
-            case "-" ->
-                computation = prev - curr;
-            case "×" ->
-                computation = prev * curr;
-            case "÷" -> {
-                if (curr == 0) {
-                    this.clear();
-                    this.currentOperand = "Error";
-                    return;
-                }
-                computation = prev / curr;
-            }
-            default -> {
-                return;
-            }
-        }
-
-        this.currentOperand = (computation - (int) computation) != 0 ? Float.toString(computation) : Integer.toString((int) computation);
-        this.previousOperand = "";
-        this.operation = "";
+        ctx.setOperation("");
+        ctx.setPreviousOperand("");
+        this.updateDisplay();
     }
 
     public void updateDisplay() {
-        current.setText(this.currentOperand);
-        previous.setText(previousOperand + " " + this.operation);
+        current.setText(ctx.getCurrentOperand());
+        previous.setText(ctx.getPreviousOperand() + " " + ctx.getOperation());
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         app = new javax.swing.JPanel();
@@ -574,92 +561,92 @@ public final class Calculator extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
 
-    private void btnDotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDotActionPerformed
-        appendNumber((this.currentOperand.isBlank() ? "0." : "."));
-    }//GEN-LAST:event_btnDotActionPerformed
+    private void btnDotActionPerformed(java.awt.event.ActionEvent evt) {                                       
+        appendNumber(ctx.getCurrentOperand().isBlank() ? "0." : ".");
+    }                                      
 
-    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {                                         
         clear();
-    }//GEN-LAST:event_btnClearActionPerformed
+    }                                        
 
-    private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
-        if (!this.currentOperand.equals("")) {
-            this.currentOperand = this.currentOperand.substring(0, this.currentOperand.length() - 1);
+    private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {                                       
+        String curr = ctx.getCurrentOperand();
+        if (!curr.equals("")) {
+            ctx.setCurrentOperand(curr.substring(0, curr.length() - 1));
             this.updateDisplay();
         }
-    }//GEN-LAST:event_btnDelActionPerformed
+    }                                      
 
-    private void btnPlusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlusActionPerformed
+    private void btnPlusActionPerformed(java.awt.event.ActionEvent evt) {                                        
         chooseOperation("+");
-    }//GEN-LAST:event_btnPlusActionPerformed
+    }                                       
 
-    private void btnMultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMultActionPerformed
+    private void btnMultActionPerformed(java.awt.event.ActionEvent evt) {                                        
         chooseOperation("×");
-    }//GEN-LAST:event_btnMultActionPerformed
+    }                                       
 
-    private void btnSubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubActionPerformed
+    private void btnSubActionPerformed(java.awt.event.ActionEvent evt) {                                       
         chooseOperation("-");
-    }//GEN-LAST:event_btnSubActionPerformed
+    }                                      
 
-    private void btnDivActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDivActionPerformed
+    private void btnDivActionPerformed(java.awt.event.ActionEvent evt) {                                       
         chooseOperation("÷");
-    }//GEN-LAST:event_btnDivActionPerformed
+    }                                      
 
-    private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEqualActionPerformed
+    private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {                                         
         this.compute();
         this.updateDisplay();
-        if (this.currentOperand.equals("Error"))
-            this.currentOperand = "";
-    }//GEN-LAST:event_btnEqualActionPerformed
+    }                                        
 
-    private void btnPlusSubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlusSubActionPerformed
-        if (!this.currentOperand.isBlank()) {
-            float tmp = -Float.parseFloat(this.currentOperand);
-            this.currentOperand = (tmp - (int) tmp) != 0 ? Float.toString(tmp) : Integer.toString((int) tmp);
+    private void btnPlusSubActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        String curr = ctx.getCurrentOperand();
+        if (!curr.isBlank()) {
+            float tmp = -Float.parseFloat(curr);
+            ctx.setCurrentOperand((tmp - (int) tmp) != 0 ? Float.toString(tmp) : Integer.toString((int) tmp));
             this.updateDisplay();
         }
-    }//GEN-LAST:event_btnPlusSubActionPerformed
+    }                                          
 
-    private void btnCloseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCloseMouseEntered
+    private void btnCloseMouseEntered(java.awt.event.MouseEvent evt) {                                      
         btnClose.setBackground(new Color(255, 75, 75));
         btnClose.setForeground(new Color(31, 30, 33));
-    }//GEN-LAST:event_btnCloseMouseEntered
+    }                                     
 
-    private void btnCloseMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCloseMouseExited
+    private void btnCloseMouseExited(java.awt.event.MouseEvent evt) {                                     
         btnClose.setBackground(new Color(21,20,22));
         btnClose.setForeground(Color.WHITE);
-    }//GEN-LAST:event_btnCloseMouseExited
+    }                                    
 
-    private void btnMiniMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMiniMouseEntered
+    private void btnMiniMouseEntered(java.awt.event.MouseEvent evt) {                                     
         btnMini.setBackground(new Color(73, 69, 78));
-    }//GEN-LAST:event_btnMiniMouseEntered
+    }                                    
 
-    private void btnMiniMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnMiniMouseExited
+    private void btnMiniMouseExited(java.awt.event.MouseEvent evt) {                                    
         btnMini.setBackground(new Color(21,20,22));
-    }//GEN-LAST:event_btnMiniMouseExited
+    }                                   
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {                                         
         System.exit(0);
-    }//GEN-LAST:event_btnCloseActionPerformed
+    }                                        
 
-    private void btnMiniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMiniActionPerformed
+    private void btnMiniActionPerformed(java.awt.event.ActionEvent evt) {                                        
         setState(Calculator.ICONIFIED);
-    }//GEN-LAST:event_btnMiniActionPerformed
+    }                                       
 
-    private void titleBarMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_titleBarMousePressed
+    private void titleBarMousePressed(java.awt.event.MouseEvent evt) {                                      
         x = evt.getX();
         y = evt.getY();
-    }//GEN-LAST:event_titleBarMousePressed
+    }                                     
 
-    private void titleBarMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_titleBarMouseDragged
+    private void titleBarMouseDragged(java.awt.event.MouseEvent evt) {                                      
         int xx = evt.getXOnScreen();
         int yy = evt.getYOnScreen();
         this.setLocation(xx - x, yy - y);
-    }//GEN-LAST:event_titleBarMouseDragged
+    }                                     
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JPanel app;
     private static javax.swing.JButton btn0;
     private static javax.swing.JButton btn1;
@@ -688,5 +675,5 @@ public final class Calculator extends javax.swing.JFrame {
     private javax.swing.JPanel resultsPanel;
     private javax.swing.JLabel title;
     private javax.swing.JPanel titleBar;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 }
