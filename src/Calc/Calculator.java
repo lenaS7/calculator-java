@@ -4,7 +4,11 @@ import java.awt.Color;
 import java.awt.event.*;
 import javax.swing.JButton;
 
-
+/**
+ * After refactoring:
+ * - Delegates state management to a Singleton (CalculatorContext).
+ * - Delegates operation creation to a Factory (OperationFactory).
+ */
 public final class Calculator extends javax.swing.JFrame {
     private final Calc.core.CalculatorContext ctx = Calc.core.CalculatorContext.getInstance();
 
