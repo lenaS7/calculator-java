@@ -1,5 +1,7 @@
 //package Calc;
-//
+///Rital yahya alghates-2210683
+//lena saleh alshehri-2211985
+//Shahad hassan alqarni-2217309 
 //import java.awt.Color;
 //import java.awt.event.*;
 //import javax.swing.JButton;
@@ -681,37 +683,18 @@
 //    private javax.swing.JLabel title;
 //    private javax.swing.JPanel titleBar;
 //    // End of variables declaration   
-//        // -----------------------------------------
-//    // ✅ Test block for HistoryDecorator (temporary)
-//    // -----------------------------------------
-//    public static void main(String[] args) {
-//        // اختبار HistoryDecorator بدون تشغيل الواجهة
-//        Calc.operations.Operation op1 = Calc.operations.OperationFactory.create("+");
-//        double r1 = op1.apply(5, 3);
-//        System.out.println("Result 1 = " + r1);
-//
-//        Calc.operations.Operation op2 = Calc.operations.OperationFactory.create("-");
-//        double r2 = op2.apply(10, 4);
-//        System.out.println("Result 2 = " + r2);
-//
-//        System.out.println("\n---- Operation History ----");
-//        for (String record : Calc.operations.HistoryDecorator.getHistory()) {
-//            System.out.println(record);
-//        }
-//    }
 //}
-//
-//
-package Calc;
 
+
+//after two pattern in stage 2
+package Calc;
+//Rital yahya alghates-2210683
+//lena saleh alshehri-2211985
+//Shahad hassan alqarni-2217309 
 import java.awt.Color;
 import java.awt.event.*;
 import javax.swing.JButton;
 
-/**
- *
- * @author youcefhmd
- */
 public final class Calculator extends javax.swing.JFrame {
     private final Calc.core.CalculatorContext ctx = Calc.core.CalculatorContext.getInstance();
 
@@ -770,7 +753,7 @@ public final class Calculator extends javax.swing.JFrame {
     }
 
     public void appendNumber(String number) {
-        // يمسح رسالة الخطأ بمجرد ما المستخدم يبدأ يكتب
+    
         ctx.clearError();
 
         if (ctx.getCurrentOperand().equals("0") && number.equals("0")) {
@@ -823,7 +806,7 @@ public final class Calculator extends javax.swing.JFrame {
             Calc.operations.Operation op = Calc.operations.OperationFactory.create(ctx.getOperation());
             computation = op.apply(prev, curr);
         } catch (ArithmeticException ex) {
-            // أبقي رسالة الخطأ ظاهرة، لا تمسحها هنا
+           
             this.clear();
             ctx.setCurrentOperand("Error");
             this.updateDisplay();
@@ -1386,4 +1369,3 @@ public final class Calculator extends javax.swing.JFrame {
     private javax.swing.JPanel titleBar;
     // End of variables declaration                   
 }
-//l
