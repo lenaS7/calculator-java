@@ -2,35 +2,32 @@ package Calc.facade;
 //Rital yahya alghates-2210683
 //lena saleh alshehri-2211985
 //Shahad hassan alqarni-2217309 
+
 import Calc.core.CalculatorContext;
 import Calc.operations.Operation;
 import Calc.operations.OperationFactory;
 
 public class CalculatorFacade {
-    private CalculatorContext context;
+    private final CalculatorContext context;
 
-    public CalculatorFacade() {
-        context = CalculatorContext.getInstance();
+    public CalculatorFacade(CalculatorContext context) {
+        this.context = context;
     }
 
-    public float compute(String operator, float a, float b) {
-    
-        context.setPreviousOperand(Float.toString(a));
-        context.setCurrentOperand(Float.toString(b));
-        context.setOperation(operator);
-
-        Operation op = OperationFactory.create(operator);
+    public float compute(float a, String opSymbol, float b) {
+        Operation op = OperationFactory.create(opSymbol);
         float result = op.apply(a, b);
-
-        context.setCurrentOperand(Float.toString(result));
-      
-        context.setPreviousOperand("");
-        context.setOperation("");
-
+        context.setCurrentOperand(String.valueOf(result)); 
         return result;
     }
 
     public String getLastResult() {
         return context.getCurrentOperand();
+    }
+
+    public void clear() {
+        context.setCurrentOperand("");
+        context.setPreviousOperand("");
+        context.setOperation("");
     }
 }

@@ -32,7 +32,6 @@ public final class OperationFactory {
         else if (s.equals("/") || s.equals("÷")) op = new DivOp();
         else throw new IllegalArgumentException("Unknown op: " + symbol);
 
-        // 🧩 نغلف العملية بالـ HistoryDecorator قبل الإرجاع
         op = new HistoryDecorator(op);
 
         return op;

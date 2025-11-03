@@ -694,9 +694,12 @@ package Calc;
 import java.awt.Color;
 import java.awt.event.*;
 import javax.swing.JButton;
+import Calc.facade.CalculatorFacade;
 
 public final class Calculator extends javax.swing.JFrame {
     private final Calc.core.CalculatorContext ctx = Calc.core.CalculatorContext.getInstance();
+    private final CalculatorFacade facade = new CalculatorFacade(ctx);
+
 
     private int x, y;
 
@@ -793,36 +796,34 @@ public final class Calculator extends javax.swing.JFrame {
         this.updateDisplay();
     }
 
-    public void compute() {
-        if (ctx.getCurrentOperand().equals("") || ctx.getPreviousOperand().equals("")) {
-            return;
-        }
+public void compute() {
+    if (ctx.getCurrentOperand().equals("") || ctx.getPreviousOperand().equals("")) {
+        return;
+    }
 
+    try {
         float curr = Float.parseFloat(ctx.getCurrentOperand());
         float prev = Float.parseFloat(ctx.getPreviousOperand());
+        String op = ctx.getOperation();
 
-        float computation;
-        try {
-            Calc.operations.Operation op = Calc.operations.OperationFactory.create(ctx.getOperation());
-            computation = op.apply(prev, curr);
-        } catch (ArithmeticException ex) {
-           
-            this.clear();
-            ctx.setCurrentOperand("Error");
-            this.updateDisplay();
-            return;
-        }
+        float result = facade.compute(prev, op, curr); 
 
-        if ((computation - (int) computation) != 0) {
-            ctx.setCurrentOperand(Float.toString(computation));
+        if ((result - (int) result) != 0) {
+            ctx.setCurrentOperand(Float.toString(result));
         } else {
-            ctx.setCurrentOperand(Integer.toString((int) computation));
+            ctx.setCurrentOperand(Integer.toString((int) result));
         }
 
         ctx.setOperation("");
         ctx.setPreviousOperand("");
-        this.updateDisplay();
+    } catch (Exception ex) {
+        this.clear();
+        ctx.setCurrentOperand("Error");
     }
+
+    this.updateDisplay();
+}
+
 
     public void updateDisplay() {
         current.setText(ctx.getCurrentOperand());
