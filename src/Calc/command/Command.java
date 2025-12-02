@@ -1,15 +1,7 @@
 package Calc.command;
-
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-/**
- *
- * @author lynasaleh
- */
-
+//Rital yahya alghates-2210683
+//lena saleh alshehri-2211985
+//Shahad hassan alqarni-2217309
 public interface Command {
     void execute();
 }

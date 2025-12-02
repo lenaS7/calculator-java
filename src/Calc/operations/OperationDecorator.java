@@ -1,13 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Calc.operations;
-
-/**
- *
- * @author lynasaleh
- */
+//Rital yahya alghates-2210683
+//lena saleh alshehri-2211985
+//Shahad hassan alqarni-2217309
 public abstract class OperationDecorator implements Operation {
     protected Operation wrapped;
 
