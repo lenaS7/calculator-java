@@ -2,10 +2,14 @@ package Calc.core;
 //Rital yahya alghates-2210683
 //lena saleh alshehri-2211985
 //Shahad hassan alqarni-2217309 
+import Calc.state.CalculatorState;
+import Calc.state.NormalState;
 
 public final class CalculatorContext {
     // Singleton 
     private static volatile CalculatorContext INSTANCE;
+    
+    private CalculatorState state = new NormalState();
 
     private String currentOperand = "";
     private String previousOperand = "";
@@ -51,4 +55,13 @@ public final class CalculatorContext {
         previousOperand = "";
         operation = "";
     }
+        public CalculatorState getState() {
+        return state;
+    }
+
+    public void setState(CalculatorState state) {
+        if (state == null) throw new IllegalArgumentException("state cannot be null");
+        this.state = state;
+    }
+
 }

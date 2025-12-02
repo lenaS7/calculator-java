@@ -696,9 +696,26 @@ import java.awt.event.*;
 import javax.swing.JButton;
 import Calc.facade.CalculatorFacade;
 
+import Calc.command.Command;
+import Calc.command.OperationCommand;
+import Calc.command.ClearCommand;
+import Calc.command.EqualCommand;
+import Calc.command.DeleteCommand;
+import Calc.command.ToggleSignCommand;
+
+
 public final class Calculator extends javax.swing.JFrame {
     private final Calc.core.CalculatorContext ctx = Calc.core.CalculatorContext.getInstance();
     private final CalculatorFacade facade = new CalculatorFacade(ctx);
+        private final Command clearCommand  = new ClearCommand(this);
+    private final Command equalCommand  = new EqualCommand(this);
+    private final Command addCommand    = new OperationCommand(this, "+");
+    private final Command subCommand    = new OperationCommand(this, "-");
+    private final Command mulCommand    = new OperationCommand(this, "×");
+    private final Command divCommand    = new OperationCommand(this, "÷");
+    private final Command deleteCommand = new DeleteCommand(this, ctx);
+    private final Command toggleSignCommand = new ToggleSignCommand(this, ctx);
+
 
 
     private int x, y;
@@ -750,79 +767,99 @@ public final class Calculator extends javax.swing.JFrame {
         }
     }
 
-    public void clear() {
-        ctx.clear();
+//    public void clear() {
+//        ctx.clear();
+//        this.updateDisplay();
+//    }
+//
+//    public void appendNumber(String number) {
+//    
+//        ctx.clearError();
+//
+//        if (ctx.getCurrentOperand().equals("0") && number.equals("0")) {
+//            return;
+//        }
+//
+//        if (number.equals(".") && ctx.getCurrentOperand().contains(".")) {
+//            return;
+//        }
+//
+//        if (ctx.getCurrentOperand().equals("0")
+//                && !number.equals("0")
+//                && !number.equals(".")) {
+//            ctx.setCurrentOperand("");
+//        }
+//
+//        ctx.setCurrentOperand(ctx.getCurrentOperand() + number);
+//        this.updateDisplay();
+//    }
+//
+//    public void chooseOperation(String operation) {
+//        if (ctx.getCurrentOperand().equals("") && !ctx.getPreviousOperand().equals("")) {
+//            ctx.setOperation(operation);
+//            this.updateDisplay();
+//        }
+//        if (ctx.getCurrentOperand().equals("")) {
+//            return;
+//        }
+//
+//        if (!ctx.getPreviousOperand().equals("")) {
+//            this.compute();
+//        }
+//
+//        ctx.setOperation(operation);
+//        ctx.setPreviousOperand(ctx.getCurrentOperand());
+//        ctx.setCurrentOperand("");
+//        this.updateDisplay();
+//    }
+//
+//public void compute() {
+//    if (ctx.getCurrentOperand().equals("") || ctx.getPreviousOperand().equals("")) {
+//        return;
+//    }
+//
+//    try {
+//        float curr = Float.parseFloat(ctx.getCurrentOperand());
+//        float prev = Float.parseFloat(ctx.getPreviousOperand());
+//        String op = ctx.getOperation();
+//
+//        float result = facade.compute(prev, op, curr); 
+//
+//        if ((result - (int) result) != 0) {
+//            ctx.setCurrentOperand(Float.toString(result));
+//        } else {
+//            ctx.setCurrentOperand(Integer.toString((int) result));
+//        }
+//
+//        ctx.setOperation("");
+//        ctx.setPreviousOperand("");
+//    } catch (Exception ex) {
+//        this.clear();
+//        ctx.setCurrentOperand("Error");
+//    }
+//
+//    this.updateDisplay();
+//}
+        public void clear() {
+        ctx.getState().clear(ctx, facade);
         this.updateDisplay();
     }
 
     public void appendNumber(String number) {
-    
-        ctx.clearError();
-
-        if (ctx.getCurrentOperand().equals("0") && number.equals("0")) {
-            return;
-        }
-
-        if (number.equals(".") && ctx.getCurrentOperand().contains(".")) {
-            return;
-        }
-
-        if (ctx.getCurrentOperand().equals("0")
-                && !number.equals("0")
-                && !number.equals(".")) {
-            ctx.setCurrentOperand("");
-        }
-
-        ctx.setCurrentOperand(ctx.getCurrentOperand() + number);
+        ctx.getState().appendNumber(ctx, number);
         this.updateDisplay();
     }
 
     public void chooseOperation(String operation) {
-        if (ctx.getCurrentOperand().equals("") && !ctx.getPreviousOperand().equals("")) {
-            ctx.setOperation(operation);
-            this.updateDisplay();
-        }
-        if (ctx.getCurrentOperand().equals("")) {
-            return;
-        }
-
-        if (!ctx.getPreviousOperand().equals("")) {
-            this.compute();
-        }
-
-        ctx.setOperation(operation);
-        ctx.setPreviousOperand(ctx.getCurrentOperand());
-        ctx.setCurrentOperand("");
+        ctx.getState().chooseOperation(ctx, operation, facade);
         this.updateDisplay();
     }
 
-public void compute() {
-    if (ctx.getCurrentOperand().equals("") || ctx.getPreviousOperand().equals("")) {
-        return;
+    public void compute() {
+        ctx.getState().compute(ctx, facade);
+        this.updateDisplay();
     }
 
-    try {
-        float curr = Float.parseFloat(ctx.getCurrentOperand());
-        float prev = Float.parseFloat(ctx.getPreviousOperand());
-        String op = ctx.getOperation();
-
-        float result = facade.compute(prev, op, curr); 
-
-        if ((result - (int) result) != 0) {
-            ctx.setCurrentOperand(Float.toString(result));
-        } else {
-            ctx.setCurrentOperand(Integer.toString((int) result));
-        }
-
-        ctx.setOperation("");
-        ctx.setPreviousOperand("");
-    } catch (Exception ex) {
-        this.clear();
-        ctx.setCurrentOperand("Error");
-    }
-
-    this.updateDisplay();
-}
 
 
     public void updateDisplay() {
@@ -1260,47 +1297,79 @@ public void compute() {
         appendNumber(ctx.getCurrentOperand().isBlank() ? "0." : ".");
     }                                      
 
-    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {                                         
-        clear();
+//    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {                                         
+//        clear();
+//    }                                        
+//
+//    private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {                                       
+//        String curr = ctx.getCurrentOperand();
+//        if (!curr.equals("")) {
+//            ctx.setCurrentOperand(curr.substring(0, curr.length() - 1));
+//            this.updateDisplay();
+//        }
+//    }                                      
+//
+//    private void btnPlusActionPerformed(java.awt.event.ActionEvent evt) {                                        
+//        chooseOperation("+");
+//    }                                       
+//
+//    private void btnMultActionPerformed(java.awt.event.ActionEvent evt) {                                        
+//        chooseOperation("×");
+//    }                                       
+//
+//    private void btnSubActionPerformed(java.awt.event.ActionEvent evt) {                                       
+//        chooseOperation("-");
+//    }                                      
+//
+//    private void btnDivActionPerformed(java.awt.event.ActionEvent evt) {                                       
+//        chooseOperation("÷");
+//    }                                      
+//
+//    private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {                                         
+//        this.compute();
+//        this.updateDisplay();
+//    }                                        
+//
+//    private void btnPlusSubActionPerformed(java.awt.event.ActionEvent evt) {                                           
+//        String curr = ctx.getCurrentOperand();
+//        if (!curr.isBlank()) {
+//            float tmp = -Float.parseFloat(curr);
+//            ctx.setCurrentOperand((tmp - (int) tmp) != 0 ? Float.toString(tmp) : Integer.toString((int) tmp));
+//            this.updateDisplay();
+//        }
+//    }        
+        private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        clearCommand.execute();
     }                                        
 
     private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {                                       
-        String curr = ctx.getCurrentOperand();
-        if (!curr.equals("")) {
-            ctx.setCurrentOperand(curr.substring(0, curr.length() - 1));
-            this.updateDisplay();
-        }
+        deleteCommand.execute();
     }                                      
 
     private void btnPlusActionPerformed(java.awt.event.ActionEvent evt) {                                        
-        chooseOperation("+");
+        addCommand.execute();
     }                                       
 
     private void btnMultActionPerformed(java.awt.event.ActionEvent evt) {                                        
-        chooseOperation("×");
+        mulCommand.execute();
     }                                       
 
     private void btnSubActionPerformed(java.awt.event.ActionEvent evt) {                                       
-        chooseOperation("-");
+        subCommand.execute();
     }                                      
 
     private void btnDivActionPerformed(java.awt.event.ActionEvent evt) {                                       
-        chooseOperation("÷");
+        divCommand.execute();
     }                                      
 
     private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {                                         
-        this.compute();
-        this.updateDisplay();
+        equalCommand.execute();
     }                                        
 
     private void btnPlusSubActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        String curr = ctx.getCurrentOperand();
-        if (!curr.isBlank()) {
-            float tmp = -Float.parseFloat(curr);
-            ctx.setCurrentOperand((tmp - (int) tmp) != 0 ? Float.toString(tmp) : Integer.toString((int) tmp));
-            this.updateDisplay();
-        }
-    }                                          
+        toggleSignCommand.execute();
+    } 
+
 
     private void btnCloseMouseEntered(java.awt.event.MouseEvent evt) {                                      
         btnClose.setBackground(new Color(255, 75, 75));
